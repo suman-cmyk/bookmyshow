@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS hall (
   address TEXT,
   latitude NUMERIC(10, 6),
   longitude NUMERIC(10, 6),
-  screen INTEGER
+  total_screen INTEGER
 );
 
 -- Create the 'available_show' table

@@ -25,3 +25,12 @@ services:
       - bms_postgres
     stdin_open: true
     tty: true  
+
+  bms_backend:
+    build:
+      context: ./api
+      dockerfile: ./api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - bms_postgres

@@ -1,0 +1,36 @@
+# Use the official Go image as the base image
+FROM golang:latest
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go module files into the container
+COPY go.mod go.sum ./
+
+# Download Go dependencies
+RUN go mod download
+
+# Install oapi-codegen
+RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
+
+# Copy the OpenAPI specification into the container
+COPY ./openapi/openapi.yaml ./openapi/
+
+# # Generate Go server code from the OpenAPI specification
+# RUN go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
+#     -package internal \
+#     -generate "chi-server,spec" \
+#     -o internal/server.gen.go \
+#     ./openapi/openapi.yaml
+
+# Copy the rest of your Go application code into the container
+COPY . .
+
+# Build the Go application
+# RUN go build -o "book_anish_show"
+
+# Expose the port your application will listen on
+EXPOSE 8080
+
+# Command to run your Go application
+CMD ["go", "run", "main.go"]

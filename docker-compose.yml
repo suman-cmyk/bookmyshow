@@ -30,6 +30,9 @@ services:
     build:
       context: ./api
       dockerfile: ./api
+      args:
+        - IMAGE_NAME=BMS_BACKEND_IMAGE
+    container_name: ${BACKEND_CONTAINER_NAME}
     ports:
       - "8080:8080"
     depends_on:

@@ -29,12 +29,12 @@ services:
   bms_backend:
     build:
       context: ./api
-      dockerfile: ./api/Dockerfile
+      dockerfile: Dockerfile
       args:
         - IMAGE_NAME=custom_bms_backend_image
     container_name: ${BACKEND_CONTAINER_NAME}
     ports:
-      - "8080:8080"
+      - "8090:8080"
     depends_on:
       - bms_postgres
-    command: go run /app/cmd/main.go  
+

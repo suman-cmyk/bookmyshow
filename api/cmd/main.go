@@ -20,7 +20,7 @@ func main() {
 		fmt.Printf("Request from: %s\n", clientIP)
 
 		// Return a response
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.JSON(http.StatusOK, "Welcome !! Book you Movie Tickets...")
 	})
 
 	// Start the server

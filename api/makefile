@@ -31,3 +31,19 @@ generate-api-handler: install-oapi-codegen
 
 .PHONY: generate-api-handler install-oapi-codegen
 
+
+# Generate Go server code from an OpenAPI spec file
+# go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
+#   -package=myapi \
+#   -generate="chi-server,spec" \
+#   -o=myapi/server.gen.go \
+#   myapi.yaml
+
+# Generate Go server code from an OpenAPI spec file
+go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
+  -package=internal\
+  -generate="chi-server,spec" \
+  -o=./internal/server.gen.go \
+  ./openapi/openapi.yaml
+
+

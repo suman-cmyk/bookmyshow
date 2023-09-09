@@ -1,5 +1,5 @@
 # bookmyshow
-just like a bookk my show app
+just like a book my show app
 
 
 

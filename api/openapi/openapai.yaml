@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Theater Booking API
+  description: API for booking theater tickets
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /cities:
+    get:
+      summary: List Cities
+      description: Retrieve a list of cities.
+      responses:
+        "200":
+          description: A list of cities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+  /cities/{cityId}/theaters:
+    get:
+      summary: List Theaters in a City
+      description: Retrieve a list of theaters in a specific city.
+      parameters:
+        - name: cityId
+          in: path
+          description: ID of the city to fetch theaters from.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A list of theaters in the city.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    totalCount:
+                      type: integer
+        "404":
+          description: City not found.
+  /bookings:
+    post:
+      summary: Create Booking
+      description: Create a booking for a show.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                showId:
+                  type: integer
+                userId:
+                  type: integer
+                status:
+                  type: string
+      responses:
+        "201":
+          description: Booking created successfully.
+        "400":
+          description: Invalid request body.
+        "404":
+          description: Show or user not found.
+  /shows/{showId}/seats:
+    get:
+      summary: List Available Seats for a Show
+      description: Retrieve a list of available seats for a specific show.
+      parameters:
+        - name: showId
+          in: path
+          description: ID of the show to fetch seats for.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A list of available seats for the show.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    row:
+                      type: string
+                    number:
+                      type: integer
+                    type:
+                      type: string
+                    status:
+                      type: string
+        "404":
+          description: Show not found.

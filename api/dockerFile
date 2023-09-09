@@ -1,36 +1,31 @@
-# Use the official Go image as the base image
-FROM golang:latest
+# Stage 1: Build the Go application
+FROM golang:latest AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Go module files into the container
 COPY go.mod go.sum ./
-
-# Download Go dependencies
 RUN go mod download
 
 # Install oapi-codegen
 RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
 
-# Copy the OpenAPI specification into the container
 COPY ./openapi/openapi.yaml ./openapi/
+RUN find . -type d
 
-# # Generate Go server code from the OpenAPI specification
-# RUN go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen \
-#     -package internal \
-#     -generate "chi-server,spec" \
-#     -o internal/server.gen.go \
-#     ./openapi/openapi.yaml
-
-# Copy the rest of your Go application code into the container
+# Build the Go application into a binary
 COPY . .
+RUN go build -o /app/book_anish_show ./cmd/main.go
 
-# Build the Go application
-# RUN go build -o "book_anish_show"
+# Stage 2: Create the final lightweight image
+FROM golang:latest
+
+WORKDIR /app
+
+# Copy the binary from the builder stage
+COPY --from=builder /app/book_anish_show ./book_anish_show
 
 # Expose the port your application will listen on
 EXPOSE 8080
 
 # Command to run your Go application
-CMD ["go", "run", "main.go"]
+CMD ["./book_anish_show"]

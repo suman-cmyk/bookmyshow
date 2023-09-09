@@ -2,23 +2,26 @@ version: '3'
 services:
   bms_postgres:
     image: postgres:latest
-    container_name: bms-postgres-container
+    container_name: ${POSTGRES_CONTAINER_NAME}
     environment:
       POSTGRES_DB: bms_db
       POSTGRES_USER: bms_user
       POSTGRES_PASSWORD: bms_password
     ports:
       - "5432:5432"
+    restart: on-failure
 
   bms_flyway:
     image: flyway/flyway:latest
-    container_name: bms-flyway-container
-    command: ["migrate"]
+    container_name: ${FLYWAY_CONTAINER_NAME}
+    command: ["migrate","info"]
     environment:
       - FLYWAY_URL=jdbc:postgresql://bms_postgres:5432/bms_db
       - FLYWAY_USER=bms_user
       - FLYWAY_PASSWORD=bms_password
     volumes:
-      - ./sql:/flyway/sql
+      - ./flyway-migration/sql:/flyway/sql
     depends_on:
       - bms_postgres
+    stdin_open: true
+    tty: true  

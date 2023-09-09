@@ -7,4 +7,5 @@ just like a bookk my show app
 //psql -U bms_user -d bms_db;
 // select * from bms_schema.city;
 
-//docker exec -it bms-postgres-container bash -c "psql -U bms_user -d bms_db -c 'SELECT * FROM bms_schema.city;'"
+//docker exec -it bms-postgres-container bash -c "psql -U //bms_user -d bms_db -c 'SELECT * FROM bms_schema.city;'"
+//docker exec -it bms-postgres-container bash -c "psql -U bms_user -d bms_db"  \dn

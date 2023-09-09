@@ -13,12 +13,7 @@ FLYWAY_CONTAINER := ${FLYWAY_CONTAINER_NAME}
 .PHONY: flyway-clean
 
 flyway-clean:
-	# Remove the existing destination directory
-	rm -r $(DEST_DIR)
-	
-	# Create the destination directory
-	mkdir -p $(DEST_DIR)
-	
+
 	# Copy the Flyway report from the container to the destination directory
 	docker cp $(FLYWAY_CONTAINER):/flyway/report.html $(DEST_DIR)
 

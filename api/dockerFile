@@ -1,31 +1,66 @@
-# Stage 1: Build the Go application
-FROM golang:latest AS builder
+# # Stage 1: Build the Go application
+# FROM golang:latest AS builder
 
-WORKDIR /app
+# WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+# # COPY go.mod go.sum ./
+# # RUN go mod download
 
-# Install oapi-codegen
-RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
+# COPY . .
 
-COPY ./openapi/openapi.yaml ./openapi/
-RUN find . -type d
+# # Install oapi-codegen
+# RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
 
-# Build the Go application into a binary
-COPY . .
-RUN go build -o /app/book_anish_show ./cmd/main.go
+# COPY ./openapi/openapi.yaml ./openapi/
 
-# Stage 2: Create the final lightweight image
+# # Build the Go application into a binary
+# COPY . .
+# RUN go build -o /app/book_anish_show ./api/main.go
+
+# # Stage 2: Create the final lightweight image
+# FROM golang:latest
+
+# WORKDIR /app
+
+# # Copy the binary from the builder stage
+# COPY --from=builder /app/book_anish_show ./
+
+# # Expose the port your application will listen on
+# EXPOSE 8080
+
+# # Command to run your Go application
+# CMD ["./book_anish_show"]
+
+
+# Use the official Go image as the base image
 FROM golang:latest
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the binary from the builder stage
-COPY --from=builder /app/book_anish_show ./book_anish_show
+# # Copy the Go module files into the container
+# COPY go.mod go.sum ./
+
+# # Download Go dependencies
+# RUN go mod download
+
+# # Install oapi-codegen
+# RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
+
+# Copy the entire application source code into the container
+COPY . .
+
+# Print the contents of the current directory for debugging purposes
+RUN ls -al
+
+# Build the Go application into a binary
+# RUN go build -o ./book_anish_show ./cmd/main.go
 
 # Expose the port your application will listen on
 EXPOSE 8080
 
 # Command to run your Go application
-CMD ["./book_anish_show"]
+# CMD ["./book_anish_show"]
+
+CMD ["go", "run", "/app/cmd/main.go"]
+

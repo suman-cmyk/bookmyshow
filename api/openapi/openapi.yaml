@@ -6,6 +6,34 @@ info:
 servers:
   - url: https://api.example.com/v1
 paths:
+  /login:
+    post:
+      summary: User Login
+      description: Authenticate a user and return a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: User authenticated successfully, JWT token returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "401":
+          description: Unauthorized. Invalid username or password.
+
   /cities:
     get:
       summary: List Cities
@@ -28,6 +56,7 @@ paths:
                       type: number
                     longitude:
                       type: number
+
   /cities/{cityId}/theaters:
     get:
       summary: List Theaters in a City
@@ -57,6 +86,7 @@ paths:
                       type: integer
         "404":
           description: City not found.
+
   /bookings:
     post:
       summary: Create Booking
@@ -81,6 +111,7 @@ paths:
           description: Invalid request body.
         "404":
           description: Show or user not found.
+
   /shows/{showId}/seats:
     get:
       summary: List Available Seats for a Show
@@ -114,3 +145,37 @@ paths:
                       type: string
         "404":
           description: Show not found.
+
+  /locations:
+    get:
+      summary: Get Location by Latitude and Longitude
+      description: Retrieve a location based on latitude and longitude.
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude coordinate.
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          description: Longitude coordinate.
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Location retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                  longitude:
+                    type: number
+                  address:
+                    type: string
+        "400":
+          description: Invalid request parameters.

@@ -19,3 +19,8 @@ just like a book my show app
 //http://localhost:8080/api/hello
 
 //curl -X POST -H "Content-Type: application/json" -d '{"address": "1600 Amphitheatre Parkway, Mountain View, CA"}' http://localhost:8090/get-location
+
+//curl -LO https://github.com/deepmap/oapi-codegen/releases/download/v1.8.1/oapi-codegen_v1.8.1_darwin_amd64
+//chmod +x oapi-codegen_v1.8.1_darwin_amd64
+//mv oapi-codegen_v1.8.1_darwin_amd64 /Users/rahulprabhakar/go/bin/oapi-codegen
+oapi-codegen --version

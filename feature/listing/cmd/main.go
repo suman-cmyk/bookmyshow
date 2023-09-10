@@ -100,7 +100,7 @@ func main() {
 	e := echo.New()
 
 	// Define a route for the GET endpoint to fetch cities
-	e.GET("/bms/api/cities", func(c echo.Context) error {
+	e.GET("/cities", func(c echo.Context) error {
 		// Query the "city" table to retrieve all cities
 		var cities []City // Create a struct to represent the city table row
 
@@ -116,7 +116,7 @@ func main() {
 	})
 
 	// Define a route for the GET endpoint to display a welcome message
-	e.GET("/bms/api", func(c echo.Context) error {
+	e.GET("/api", func(c echo.Context) error {
 		// Get the client's IP address
 		clientIP := c.Request().RemoteAddr
 
@@ -160,6 +160,56 @@ func main() {
 		return c.JSON(http.StatusOK, response)
 	})
 
+	// Create a route to insert a user
+	e.POST("/user", func(c echo.Context) error {
+		var user User
+
+		// Bind the incoming JSON data to the User struct
+		if err := c.Bind(&user); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request data"})
+		}
+
+		// Insert the user data into the database
+		_, err := db.Exec("INSERT INTO bms_schema.\"user\" (name, type) VALUES ($1, $2)", user.Name, user.Type)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to insert user"})
+		}
+
+		// Return a success response
+		return c.JSON(http.StatusCreated, map[string]string{"message": "User inserted successfully"})
+	})
+
+	//get all users
+	e.GET("/user", func(c echo.Context) error {
+		// Query all users from the database
+		rows, err := db.Query("SELECT id, name, type FROM bms_schema.\"user\"")
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve users"})
+		}
+		defer rows.Close()
+
+		var users []User
+
+		// Iterate through the rows and scan into the User struct
+		for rows.Next() {
+			var user User
+			if err := rows.Scan(&user.ID, &user.Name, &user.Type); err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve users"})
+			}
+			users = append(users, user)
+		}
+
+		// Return the list of users as JSON
+		if len(users) == 0 {
+			// Return an empty array if there are no users
+			return c.JSON(http.StatusOK, []User{})
+		} else {
+			return c.JSON(http.StatusOK, users)
+		}
+
+	})
+
 	// Start the server
 	err := e.Start(":8080")
 	if err != nil {
@@ -178,4 +228,11 @@ type City struct {
 type LocationResponse struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
+}
+
+// User represents the user data.
+type User struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
 }

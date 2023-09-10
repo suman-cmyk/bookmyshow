@@ -48,3 +48,8 @@ export PATH=$PATH:/usr/local/bin
 
 inspect folder structure
 //docker run --rm -it bookmyshow_bms_backend /bin/sh 
+
+curl -X POST http://localhost:8090/user -H "Content-Type: application/json" -d '{
+  "name": "John Doe",
+  "type": "Regular"
+}'

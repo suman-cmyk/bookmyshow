@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -41,8 +43,53 @@ func InitializeDatabase() error {
 	return fmt.Errorf("Failed to establish a database connection after %d retries", retries)
 }
 
-func main() {
+func fetchLocation(address string) (float64, float64, error) {
+	// Replace with your Google Maps Geocoding API key
+	apiKey := "AIzaSyDEdq504CIILVVyU7DR9xqjdO9ywM8BQAw"
 
+	// Build the URL for the Geocoding API request
+	url := fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address, apiKey)
+
+	// Send an HTTP GET request to the Google Maps Geocoding API
+	response, err := http.Get(url)
+	if err != nil {
+		return 0, 0, err
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return 0, 0, err
+	}
+	fmt.Print("reposne body", body)
+	// Parse the JSON response
+	var result map[string]interface{}
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// Check if the API request was successful
+	if status, ok := result["status"].(string); !ok || status != "OK" {
+		return 0, 0, fmt.Errorf("Geocoding API request failed with status: %s", status)
+	}
+
+	// Extract the latitude and longitude from the response
+	if results, ok := result["results"].([]interface{}); ok && len(results) > 0 {
+		if geometry, ok := results[0].(map[string]interface{})["geometry"].(map[string]interface{}); ok {
+			if location, ok := geometry["location"].(map[string]interface{}); ok {
+				latitude := location["lat"].(float64)
+				longitude := location["lng"].(float64)
+				return latitude, longitude, nil
+			}
+		}
+	}
+
+	return 0, 0, fmt.Errorf("Location not found")
+}
+
+func main() {
 	dberr := InitializeDatabase()
 	if dberr != nil {
 		fmt.Printf("Error initializing database: %v\n", dberr)
@@ -80,6 +127,39 @@ func main() {
 		return c.JSON(http.StatusOK, "Welcome !! Book your Movie Tickets...")
 	})
 
+	// Define a route for the POST endpoint to fetch location
+	e.POST("/get-location", func(c echo.Context) error {
+		// Read the address from the request body
+		body, err := ioutil.ReadAll(c.Request().Body)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+		}
+
+		// Convert the JSON request body to a struct
+		var request struct {
+			Address string `json:"address"`
+		}
+		err = json.Unmarshal(body, &request)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON request body"})
+		}
+
+		// Fetch the location using the Google Maps Geocoding API
+		latitude, longitude, err := fetchLocation(request.Address)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch location"})
+		}
+
+		// Create a response struct
+		response := LocationResponse{
+			Latitude:  latitude,
+			Longitude: longitude,
+		}
+
+		// Return the location as JSON response
+		return c.JSON(http.StatusOK, response)
+	})
+
 	// Start the server
 	err := e.Start(":8080")
 	if err != nil {
@@ -93,4 +173,9 @@ type City struct {
 	Name      string  `db:"name"`
 	Latitude  float64 `db:"latitude"`
 	Longitude float64 `db:"longitude"`
+}
+
+type LocationResponse struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }

@@ -16,4 +16,6 @@ just like a book my show app
 
 //curl http://localhost:8080/api/hello
 
-http://localhost:8080/api/hello
+//http://localhost:8080/api/hello
+
+//curl -X POST -H "Content-Type: application/json" -d '{"address": "1600 Amphitheatre Parkway, Mountain View, CA"}' http://localhost:8090/get-location

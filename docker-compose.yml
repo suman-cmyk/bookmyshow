@@ -26,13 +26,13 @@ services:
     stdin_open: true
     tty: true  
 
-  bms_backend:
+  bms_listing_service:
     build:
-      context: ./api
+      context: ./feature/listing
       dockerfile: Dockerfile
       args:
-        - IMAGE_NAME=custom_bms_backend_image
-    container_name: ${BACKEND_CONTAINER_NAME}
+        - IMAGE_NAME=listing_feature_backend_image
+    container_name: ${LISTING_FEATURE_BACKEND_CONTAINER_NAME}
     ports:
       - "8090:8080"
     depends_on:

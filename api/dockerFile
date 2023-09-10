@@ -1,29 +1,28 @@
 # # Stage 1: Build the Go application
 # FROM golang:latest AS builder
 
+# # Set CGO_ENABLED=0 to build a statically linked binary
+# ENV CGO_ENABLED=0
+
 # WORKDIR /app
 
-# # COPY go.mod go.sum ./
-# # RUN go mod download
+# # Copy only the Go module files and download the dependencies first to leverage Docker layer caching
+# COPY go.mod go.sum ./
+# RUN go mod download
 
+# # Copy the rest of the application source code
 # COPY . .
-
-# # Install oapi-codegen
-# RUN go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
-
-# COPY ./openapi/openapi.yaml ./openapi/
 
 # # Build the Go application into a binary
-# COPY . .
-# RUN go build -o /app/book_anish_show ./api/main.go
+# RUN go build -o /book_anish_show ./cmd/main.go
 
 # # Stage 2: Create the final lightweight image
-# FROM golang:latest
+# FROM alpine:latest
 
 # WORKDIR /app
 
 # # Copy the binary from the builder stage
-# COPY --from=builder /app/book_anish_show ./
+# COPY --from=builder /book_anish_show ./
 
 # # Expose the port your application will listen on
 # EXPOSE 8080
@@ -31,6 +30,12 @@
 # # Command to run your Go application
 # CMD ["./book_anish_show"]
 
+# # /
+# # └── app
+# #     ├── book_anish_show (binary)
+# #     └── Dockerfile (only exists temporarily during the build)
+
+#######################################################################################
 
 # Use the official Go image as the base image
 FROM golang:latest

@@ -7,9 +7,12 @@ services:
       POSTGRES_DB: bms_db
       POSTGRES_USER: bms_user
       POSTGRES_PASSWORD: bms_password
+      PGDATA: /var/lib/postgresql/data/some_name
     ports:
       - "5432:5432"
     restart: on-failure
+    volumes:
+      - ./db:/var/lib/postgresql/data/some_name/
 
   bms_flyway:
     image: flyway/flyway:latest

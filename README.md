@@ -44,7 +44,7 @@ bash-3.2$ sudo mv oapi-codegen_v1.8.1_darwin_amd64 /usr/local/bin/oapi-codegen
 bash-3.2$ oapi-codegen --version
 bash: /Users/rahulprabhakar/go/bin/oapi-codegen: No such file or directory
 bash-3.2$ 
-export PATH=$PATH:/usr/local/bin
+
 
 inspect folder structure
 //docker run --rm -it bookmyshow_bms_backend /bin/sh 
@@ -53,3 +53,5 @@ curl -X POST http://localhost:8090/user -H "Content-Type: application/json" -d '
   "name": "John Doe",
   "type": "Regular"
 }'
+
+ls -aR | grep ":$" | perl -pe 's/:$//;s/[^-][^\/]*\//    /g;s/^    (\S)/└── \1/;s/(^    |    (?= ))/│   /g;s/    (\S)/└── \1/'

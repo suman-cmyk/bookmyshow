@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bms-postgres
+spec:
+  replicas: 1
+  serviceName: bms-postgres
+  selector:
+    matchLabels:
+      app: bms-postgres
+  template:
+    metadata:
+      labels:
+        app: bms-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: bms_db
+            - name: POSTGRES_USER
+              value: bms_user
+            - name: POSTGRES_PASSWORD
+              value: bms_password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data/some_name
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bms-postgres
+spec:
+  selector:
+    app: bms-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bms-flyway-migrate
+spec:
+  template:
+    spec:
+      containers:
+        - name: flyway
+          image: flyway/flyway:latest
+          command: ["migrate"]
+          args: ["info"]
+          env:
+            - name: FLYWAY_URL
+              value: jdbc:postgresql://bms-postgres:5432/bms_db
+            - name: FLYWAY_USER
+              value: bms_user
+            - name: FLYWAY_PASSWORD
+              value: bms_password
+          volumeMounts:
+            - name: flyway-migration
+              mountPath: /flyway/sql
+      restartPolicy: Never
+    volumes:
+      - name: flyway-migration
+        emptyDir: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bms-listing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bms-listing-service
+  template:
+    metadata:
+      labels:
+        app: bms-listing-service
+    spec:
+      containers:
+        - name: listing-service
+          image: listing_feature_backend_image
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bms-listing-service
+spec:
+  selector:
+    app: bms-listing-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

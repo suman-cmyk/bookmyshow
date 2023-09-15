@@ -1,0 +1,15 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: BuildConfig
+metadata:
+  name: bookmyshow-k8-config
+spec:
+  serviceAccountName: builder
+  source:
+    contextDir: ./feature/listing
+    git:
+      url: https://github.com/your-repo.git
+      revision: main
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:v1.6.0
+      args: ["--context=./feature/listing", "--dockerfile=/Dockerfile", "--destination=sumanish/bookmyshow:backendimage_k8s"]

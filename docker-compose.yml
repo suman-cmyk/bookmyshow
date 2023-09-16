@@ -12,7 +12,7 @@ services:
       - "5432:5432"
     restart: on-failure
     volumes:
-      - ./db:/var/lib/postgresql/data/some_name/
+      - ./db:/var/lib/postgresql/data/some_name1/
 
   bms_flyway:
     image: flyway/flyway:latest

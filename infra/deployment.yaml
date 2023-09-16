@@ -1,24 +1,21 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: anish-bookmyshow-deployment
-#   labels:
-#     app: bms_anish
-# spec:
-#   replicas: 2
-#   selector:
-#     matchLabels:
-#       app: web
-#   template:
-#     metadata:
-#       labels:
-#         app: web
-#     spec:
-#       containers:
-#     - name: bms_listing_service
-#         image: nginx
-#         ports:
-#         - containerPort: 80
-#     build:
-#     contextDir: ./feature/listing 
-#     dockerfile:  Dockerfile  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anish-bookmyshow-deployment
+  labels:
+    app: bms_anish
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: bms_listing_service
+        image: sumanish/bookmyshow_bms_listing_service:latest
+        ports:
+        - containerPort: 80
